@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// Integer represent a constraint which could be represented as integer value.
 type Integer struct {
 	checkName string
 
@@ -19,8 +20,9 @@ func NewAge(checkName string, minValue, maxValue int) Integer {
 	}
 }
 
-func (i *Integer) Verify(paramSignal []string) error {
-	age, err := strconv.Atoi(paramSignal[0])
+// Verify checks that the provided signal is in the range between min and max value
+func (i *Integer) Verify(paramSignals []string) error {
+	age, err := strconv.Atoi(paramSignals[0])
 	if err != nil {
 		return errors.Wrap(err, "failed to convert signal input to int")
 	}
@@ -32,7 +34,7 @@ func (i *Integer) Verify(paramSignal []string) error {
 	return nil
 }
 
-func (i *Integer) GetOffset() int {
+func (i *Integer) GetLength() int {
 	return 1
 }
 

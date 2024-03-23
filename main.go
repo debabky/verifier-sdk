@@ -12,6 +12,8 @@ type ZkVerificationBuilder struct {
 	constraintsLen int
 }
 
+// AddConstraints adds constraints to be verified by. Returns an error if some
+// constraint already added.
 func (builder *ZkVerificationBuilder) AddConstraints(constraints ...Constraint) error {
 	for _, constraint := range constraints {
 		if builder.constraints[constraint.GetName()] != nil {
@@ -24,23 +26,25 @@ func (builder *ZkVerificationBuilder) AddConstraints(constraints ...Constraint) 
 	return nil
 }
 
-func (builder *ZkVerificationBuilder) Verify(piA []string, piB [][]string, piC []string, signals []string, verificationKey []byte) error {
+// Verify verifies given signals by provided earlier constraints by AddConstraints method.
+// Also verifies provided proof with Groth16 algorithm on bn256 curve.
+func (builder *ZkVerificationBuilder) Verify(piA []string, piB [][]string, piC []string, pubSignals []string, verificationKey []byte) error {
 	if len(builder.constraints) == 0 {
 		return errors.New("you need to specify constraints first")
 	}
 
 	var signalIndex int
 	for _, constraint := range builder.constraints {
-		if signalIndex+constraint.GetOffset() >= len(signals) {
+		if signalIndex+constraint.GetLength() >= len(pubSignals) {
 			return errors.New("signals length is too short")
 		}
 
-		err := constraint.Verify(signals[signalIndex : signalIndex+constraint.GetOffset()]) // check this
+		err := constraint.Verify(pubSignals[signalIndex : signalIndex+constraint.GetLength()]) // check this
 		if err != nil {
 			return errors.Wrap(err, "verification failed")
 		}
 
-		signalIndex += constraint.GetOffset()
+		signalIndex += constraint.GetLength()
 	}
 
 	return verifier.VerifyGroth16(types.ZKProof{
@@ -50,6 +54,6 @@ func (builder *ZkVerificationBuilder) Verify(piA []string, piB [][]string, piC [
 			C:        piC,
 			Protocol: "groth16", // Unused field, may be left empty
 		},
-		PubSignals: signals,
+		PubSignals: pubSignals,
 	}, verificationKey)
 }

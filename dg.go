@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Dg represents Dg block hash
 type Dg struct {
 	checkName string
 
@@ -24,8 +25,9 @@ func NewDg(checkName string, digest []byte) (Dg, error) {
 	}, nil
 }
 
-func (dg *Dg) Verify(paramSignal []string) error {
-	ints, err := stringsToArrayBigInt([]string{paramSignal[0], paramSignal[1]})
+// Verify checks that the provided signals concatenation is dg hash
+func (dg *Dg) Verify(paramSignals []string) error {
+	ints, err := stringsToArrayBigInt([]string{paramSignals[0], paramSignals[1]})
 	if err != nil {
 		return errors.Wrap(err, "failed to convert strings to big integers")
 	}
@@ -66,7 +68,7 @@ func stringToBigInt(s string) (*big.Int, error) {
 	return n, nil
 }
 
-func (dg *Dg) GetOffset() int {
+func (dg *Dg) GetLength() int {
 	return 2
 }
 

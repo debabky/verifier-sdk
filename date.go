@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// Date represent a constraint which could be represented as date.
 type Date struct {
 	checkName string
 
@@ -13,7 +14,8 @@ type Date struct {
 	year  int
 }
 
-// NewDate pass -1 if you want to mark that some value can be omitted
+// NewDate accepts arguments in which -1 can be passed in case of necessity of omitting some parameter.
+// If all the arguments are -1, returns an error
 func NewDate(checkName string, day, month, year int) (Date, error) {
 	if day == -1 && month == -1 && year == -1 {
 		return Date{}, errors.New("failed to create a new birthday: all the values are not significant")
@@ -24,8 +26,9 @@ func NewDate(checkName string, day, month, year int) (Date, error) {
 	}, nil
 }
 
-func (d *Date) Verify(paramSignal []string) error {
-	day, err := strconv.Atoi(paramSignal[0])
+// Verify checks that the provided signals are integer values
+func (d *Date) Verify(paramSignals []string) error {
+	day, err := strconv.Atoi(paramSignals[0])
 	if err != nil {
 		return errors.Wrap(err, "failed to convert day signal input to int")
 	}
@@ -33,7 +36,7 @@ func (d *Date) Verify(paramSignal []string) error {
 		return errors.New("invalid day")
 	}
 
-	month, err := strconv.Atoi(paramSignal[1])
+	month, err := strconv.Atoi(paramSignals[1])
 	if err != nil {
 		return errors.Wrap(err, "failed to convert month signal input to int")
 	}
@@ -41,7 +44,7 @@ func (d *Date) Verify(paramSignal []string) error {
 		return errors.New("invalid month")
 	}
 
-	year, err := strconv.Atoi(paramSignal[2])
+	year, err := strconv.Atoi(paramSignals[2])
 	if err != nil {
 		return errors.Wrap(err, "failed to convert month signal input to int")
 	}
@@ -52,7 +55,7 @@ func (d *Date) Verify(paramSignal []string) error {
 	return nil
 }
 
-func (d *Date) GetOffset() int {
+func (d *Date) GetLength() int {
 	return 3
 }
 
